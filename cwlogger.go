@@ -20,7 +20,8 @@ func Init(requestID string) {
 	}
 }
 
-func setPrefix(level string) {
+// SetPrefix sets the logging prefix
+func SetPrefix(level string) {
 	log.SetPrefix(fmt.Sprintf(cwLogger.prefix, level, cwLogger.id))
 }
 
@@ -31,7 +32,7 @@ func InfoString(msg string) {
 
 // Info a message with INFO level
 func Info(msg ILogEntry) {
-	setPrefix("INFO")
+	SetPrefix("INFO")
 	log.Println(msg.Stringify())
 }
 
@@ -42,7 +43,7 @@ func WarnString(msg string) {
 
 // Warn logs a message with WARNING level
 func Warn(msg ILogEntry) {
-	setPrefix("WARNING")
+	SetPrefix("WARNING")
 	log.Println(msg.Stringify())
 }
 
@@ -53,6 +54,6 @@ func ErrorString(msg string) {
 
 // Error logs a msg with ERROR level
 func Error(msg ILogEntry) {
-	setPrefix("ERROR")
+	SetPrefix("ERROR")
 	log.Println(msg.Stringify())
 }

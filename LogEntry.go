@@ -14,7 +14,7 @@ type LogEntry struct {
 func (e *LogEntry) Stringify() string {
 	raw, err := json.Marshal(*e)
 	if err != nil {
-		setPrefix("ERROR")
+		SetPrefix("ERROR")
 		return err.Error()
 	}
 
