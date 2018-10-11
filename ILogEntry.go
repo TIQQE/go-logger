@@ -1,5 +1,5 @@
 package logger
 
-type ILogEntry struct {
+type ILogEntry interface {
 	stringify() string
 }
