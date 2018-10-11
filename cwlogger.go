@@ -48,5 +48,5 @@ func ErrorString(msg string) {
 
 func Error(msg ILogEntry) {
 	setPrefix("ERROR")
-	log.Println(msg.stringify())s
+	log.Println(msg.stringify())
 }
