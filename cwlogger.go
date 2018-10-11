@@ -32,7 +32,7 @@ func InfoString(msg string) {
 // Info a message with INFO level
 func Info(msg ILogEntry) {
 	setPrefix("INFO")
-	log.Println(msg.stringify())
+	log.Println(msg.Stringify())
 }
 
 // WarnString a string with WARNING level
@@ -43,7 +43,7 @@ func WarnString(msg string) {
 // Warn logs a message with WARNING level
 func Warn(msg ILogEntry) {
 	setPrefix("WARNING")
-	log.Println(msg.stringify())
+	log.Println(msg.Stringify())
 }
 
 // ErrorString logs a string with ERROR level
@@ -54,5 +54,5 @@ func ErrorString(msg string) {
 // Error logs a msg with ERROR level
 func Error(msg ILogEntry) {
 	setPrefix("ERROR")
-	log.Println(msg.stringify())
+	log.Println(msg.Stringify())
 }
