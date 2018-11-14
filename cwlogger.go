@@ -1,13 +1,11 @@
 package logger
 
 import (
-	"fmt"
 	"log"
 )
 
 type logger struct {
-	id     string
-	prefix string
+	id string
 }
 
 var cwLogger logger
@@ -15,14 +13,8 @@ var cwLogger logger
 // Init initializes the logger with the request id and prefix
 func Init(requestID string) {
 	cwLogger = logger{
-		id:     requestID,
-		prefix: "[%s] {%s} ",
+		id: requestID,
 	}
-}
-
-// SetPrefix sets the logging prefix
-func SetPrefix(level string) {
-	log.SetPrefix(fmt.Sprintf(cwLogger.prefix, level, cwLogger.id))
 }
 
 // InfoString logs a string message with INFO level
@@ -32,7 +24,8 @@ func InfoString(msg string) {
 
 // Info a message with INFO level
 func Info(msg ILogEntry) {
-	SetPrefix("INFO")
+	msg.SetLogLevel("INFO")
+	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
 }
 
@@ -43,7 +36,8 @@ func WarnString(msg string) {
 
 // Warn logs a message with WARNING level
 func Warn(msg ILogEntry) {
-	SetPrefix("WARNING")
+	msg.SetLogLevel("WARNING")
+	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
 }
 
@@ -54,6 +48,7 @@ func ErrorString(msg string) {
 
 // Error logs a msg with ERROR level
 func Error(msg ILogEntry) {
-	SetPrefix("ERROR")
+	msg.SetLogLevel("ERROR")
+	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
 }
