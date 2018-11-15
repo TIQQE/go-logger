@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -17,6 +18,11 @@ func Init(requestID string) {
 	}
 }
 
+// InfoStringf info log helper to use sprintf formatting.
+func InfoStringf(format string, args ...interface{}) {
+	InfoString(fmt.Sprintf(format, args...))
+}
+
 // InfoString logs a string message with INFO level
 func InfoString(msg string) {
 	Info(&LogEntry{Message: msg})
@@ -29,6 +35,11 @@ func Info(msg ILogEntry) {
 	log.Println(msg.Stringify())
 }
 
+// WarnStringf warn log helper to use sprintf formatting.
+func WarnStringf(format string, args ...interface{}) {
+	WarnString(fmt.Sprintf(format, args...))
+}
+
 // WarnString a string with WARNING level
 func WarnString(msg string) {
 	Warn(&LogEntry{Message: msg})
@@ -39,6 +50,11 @@ func Warn(msg ILogEntry) {
 	msg.SetLogLevel("WARNING")
 	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
+}
+
+// ErrorStringf error log helper to use sprintf formatting.
+func ErrorStringf(format string, args ...interface{}) {
+	ErrorString(fmt.Sprintf(format, args...))
 }
 
 // ErrorString logs a string with ERROR level
