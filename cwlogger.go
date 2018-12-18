@@ -6,8 +6,7 @@ import (
 )
 
 type logger struct {
-	id     string
-	prefix string
+	id string
 }
 
 var cwLogger logger
@@ -15,14 +14,13 @@ var cwLogger logger
 // Init initializes the logger with the request id and prefix
 func Init(requestID string) {
 	cwLogger = logger{
-		id:     requestID,
-		prefix: "[%s] {%s} ",
+		id: requestID,
 	}
 }
 
-// SetPrefix sets the logging prefix
-func SetPrefix(level string) {
-	log.SetPrefix(fmt.Sprintf(cwLogger.prefix, level, cwLogger.id))
+// InfoStringf info log helper to use sprintf formatting.
+func InfoStringf(format string, args ...interface{}) {
+	InfoString(fmt.Sprintf(format, args...))
 }
 
 // InfoString logs a string message with INFO level
@@ -32,8 +30,14 @@ func InfoString(msg string) {
 
 // Info a message with INFO level
 func Info(msg ILogEntry) {
-	SetPrefix("INFO")
+	msg.SetLogLevel("INFO")
+	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
+}
+
+// WarnStringf warn log helper to use sprintf formatting.
+func WarnStringf(format string, args ...interface{}) {
+	WarnString(fmt.Sprintf(format, args...))
 }
 
 // WarnString a string with WARNING level
@@ -43,8 +47,14 @@ func WarnString(msg string) {
 
 // Warn logs a message with WARNING level
 func Warn(msg ILogEntry) {
-	SetPrefix("WARNING")
+	msg.SetLogLevel("WARNING")
+	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
+}
+
+// ErrorStringf error log helper to use sprintf formatting.
+func ErrorStringf(format string, args ...interface{}) {
+	ErrorString(fmt.Sprintf(format, args...))
 }
 
 // ErrorString logs a string with ERROR level
@@ -54,6 +64,7 @@ func ErrorString(msg string) {
 
 // Error logs a msg with ERROR level
 func Error(msg ILogEntry) {
-	SetPrefix("ERROR")
+	msg.SetLogLevel("ERROR")
+	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
 }
