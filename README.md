@@ -13,10 +13,11 @@ The AWSRequestID needs to be set using the Init() function and LogLevel will be 
 The default log message looks like the following.
 ```go
 type LogEntry struct {
-    Message      string `json:"message"`
-	ErrorMessage string `json:"errorMessage,omitempty"`
-	RequestID    string `json:"requestId"`
-	LogLevel     string `json:"logLevel"`
+	Message      string                 `json:"message"`
+	ErrorMessage string                 `json:"errorMessage,omitempty"`
+	RequestID    string                 `json:"requestId"`
+	LogLevel     string                 `json:"logLevel"`
+	Keys         map[string]interface{} `json:"keys,omitempty"`
 }
 ```
 
@@ -27,7 +28,13 @@ It will marshal into
     "errorMessage": "something",
     "requestId": "INFO",
     "logLevel": "asdasd-asd123-sasad-asd",
+    "keys": {
+        "somekey": "asd",
+    }
 }
 ```
 
 Leaving ErrorMessage empty will omit the property from the marshalled message.
+
+A map called Keys can be used to add custom fields to the log message. 
+There is a helper function to set the values in the map when needed.
