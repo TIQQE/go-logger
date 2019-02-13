@@ -2,7 +2,7 @@ package logger
 
 import (
 	"fmt"
-	"log"
+	"time"
 )
 
 type logger struct {
@@ -33,6 +33,7 @@ func Info(msg ILogEntry) {
 	msg.SetLogLevel("INFO")
 	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
+	fmt.Println(msg.Stringify())
 }
 
 // WarnStringf warn log helper to use sprintf formatting.
@@ -50,6 +51,7 @@ func Warn(msg ILogEntry) {
 	msg.SetLogLevel("WARNING")
 	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
+	fmt.Println(msg.Stringify())
 }
 
 // ErrorStringf error log helper to use sprintf formatting.
@@ -67,4 +69,5 @@ func Error(msg ILogEntry) {
 	msg.SetLogLevel("ERROR")
 	msg.SetRequestID(cwLogger.id)
 	log.Println(msg.Stringify())
+	fmt.Println(msg.Stringify())
 }
