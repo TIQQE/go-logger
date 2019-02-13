@@ -6,15 +6,19 @@ import (
 )
 
 type logger struct {
-	id string
+	id         string
+	sourceName string
+	sourceID   string
 }
 
 var cwLogger logger
 
 // Init initializes the logger with the request id and prefix
-func Init(requestID string) {
+func Init(requestID, sourceName, sourceID string) {
 	cwLogger = logger{
-		id: requestID,
+		id:         requestID,
+		sourceName: sourceName,
+		sourceID:   sourceID,
 	}
 }
 
@@ -32,7 +36,9 @@ func InfoString(msg string) {
 func Info(msg ILogEntry) {
 	msg.SetLogLevel("INFO")
 	msg.SetRequestID(cwLogger.id)
-	log.Println(msg.Stringify())
+	msg.SetEventTime(time.Now())
+	msg.SetSourceName(cwLogger.sourceName)
+	msg.SetSourceID(cwLogger.sourceID)
 	fmt.Println(msg.Stringify())
 }
 
@@ -50,7 +56,9 @@ func WarnString(msg string) {
 func Warn(msg ILogEntry) {
 	msg.SetLogLevel("WARNING")
 	msg.SetRequestID(cwLogger.id)
-	log.Println(msg.Stringify())
+	msg.SetEventTime(time.Now())
+	msg.SetSourceName(cwLogger.sourceName)
+	msg.SetSourceID(cwLogger.sourceID)
 	fmt.Println(msg.Stringify())
 }
 
@@ -68,6 +76,8 @@ func ErrorString(msg string) {
 func Error(msg ILogEntry) {
 	msg.SetLogLevel("ERROR")
 	msg.SetRequestID(cwLogger.id)
-	log.Println(msg.Stringify())
+	msg.SetEventTime(time.Now())
+	msg.SetSourceName(cwLogger.sourceName)
+	msg.SetSourceID(cwLogger.sourceID)
 	fmt.Println(msg.Stringify())
 }
