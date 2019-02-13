@@ -14,11 +14,10 @@ type logger struct {
 var cwLogger logger
 
 // Init initializes the logger with the request id and prefix
-func Init(requestID, sourceName, sourceID string) {
+func Init(requestID, sourceName string) {
 	cwLogger = logger{
 		id:         requestID,
 		sourceName: sourceName,
-		sourceID:   sourceID,
 	}
 }
 
@@ -38,7 +37,6 @@ func Info(msg ILogEntry) {
 	msg.SetRequestID(cwLogger.id)
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
-	msg.SetSourceID(cwLogger.sourceID)
 	fmt.Println(msg.Stringify())
 }
 
@@ -58,7 +56,7 @@ func Warn(msg ILogEntry) {
 	msg.SetRequestID(cwLogger.id)
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
-	msg.SetSourceID(cwLogger.sourceID)
+	msg.SetErrorCode(msg.GetMessage())
 	fmt.Println(msg.Stringify())
 }
 
@@ -78,6 +76,6 @@ func Error(msg ILogEntry) {
 	msg.SetRequestID(cwLogger.id)
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
-	msg.SetSourceID(cwLogger.sourceID)
+	msg.SetErrorCode(msg.GetMessage())
 	fmt.Println(msg.Stringify())
 }
