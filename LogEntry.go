@@ -2,11 +2,15 @@ package logger
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // LogEntry default log entry
 type LogEntry struct {
+	EventTime    string                 `json:"eventTime"`
 	Message      string                 `json:"message"`
+	SourceName   string                 `json:"sourceName"`
+	SourceID     string                 `json:"sourceId"`
 	ErrorMessage string                 `json:"errorMessage,omitempty"`
 	RequestID    string                 `json:"requestId"`
 	LogLevel     string                 `json:"logLevel"`
@@ -29,6 +33,17 @@ func (e *LogEntry) SetLogLevel(level string) { e.LogLevel = level }
 
 // SetRequestID sets the request id
 func (e *LogEntry) SetRequestID(id string) { e.RequestID = id }
+
+// SetSourceName sets the source name in the log event
+func (e *LogEntry) SetSourceName(name string) { e.SourceName = name }
+
+// SetSourceID sets the source id in the log event
+func (e *LogEntry) SetSourceID(id string) { e.SourceID = id }
+
+// SetEventTime sets the event time to the time in RFC3339
+func (e *LogEntry) SetEventTime(t time.Time) {
+	e.EventTime = t.Format(time.RFC3339Nano)
+}
 
 // SetKey sets the value for the custom key
 func (e *LogEntry) SetKey(key string, value interface{}) {
