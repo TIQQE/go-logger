@@ -9,5 +9,6 @@ type ILogEntry interface {
 	SetRequestID(string)
 	SetEventTime(time.Time)
 	SetSourceName(string)
-	SetSourceID(string)
+	SetErrorCode(string)
+	GetMessage() string
 }

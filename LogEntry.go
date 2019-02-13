@@ -10,7 +10,7 @@ type LogEntry struct {
 	EventTime    string                 `json:"eventTime"`
 	Message      string                 `json:"message"`
 	SourceName   string                 `json:"sourceName"`
-	SourceID     string                 `json:"sourceId"`
+	ErrorCode    string                 `json:"errorCode,omitempty"`
 	ErrorMessage string                 `json:"errorMessage,omitempty"`
 	RequestID    string                 `json:"requestId"`
 	LogLevel     string                 `json:"logLevel"`
@@ -37,8 +37,15 @@ func (e *LogEntry) SetRequestID(id string) { e.RequestID = id }
 // SetSourceName sets the source name in the log event
 func (e *LogEntry) SetSourceName(name string) { e.SourceName = name }
 
-// SetSourceID sets the source id in the log event
-func (e *LogEntry) SetSourceID(id string) { e.SourceID = id }
+// SetErrorCode sets the error code in the message if it is empty
+func (e *LogEntry) SetErrorCode(code string) {
+	if e.ErrorCode == "" {
+		e.ErrorCode = code
+	}
+}
+
+// GetMessage returns the message
+func (e *LogEntry) GetMessage() string { return e.Message }
 
 // SetEventTime sets the event time to the time in RFC3339
 func (e *LogEntry) SetEventTime(t time.Time) {
