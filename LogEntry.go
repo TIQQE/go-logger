@@ -5,6 +5,16 @@ import (
 	"time"
 )
 
+// AlertAction action to take in AlertOps
+type AlertAction string
+
+// Alert action constants
+const (
+	ActionOpen   AlertAction = "Open"
+	ActionUpdate AlertAction = "Update"
+	ActionClose  AlertAction = "Close"
+)
+
 // LogEntry default log entry
 type LogEntry struct {
 	EventTime    string                 `json:"eventTime"`
@@ -15,6 +25,7 @@ type LogEntry struct {
 	RequestID    string                 `json:"requestId"`
 	LogLevel     string                 `json:"logLevel"`
 	Keys         map[string]interface{} `json:"keys,omitempty"`
+	Action       AlertAction            `json:"alertAction,omitempty"`
 }
 
 // Stringify marshal json to string
@@ -50,6 +61,14 @@ func (e *LogEntry) GetMessage() string { return e.Message }
 // SetEventTime sets the event time to the time in RFC3339
 func (e *LogEntry) SetEventTime(t time.Time) {
 	e.EventTime = t.Format(time.RFC3339Nano)
+}
+
+// SetAction sets the alert action in the message.
+// This is by defalt set to Open for Error events.
+func (e *LogEntry) SetAction(action AlertAction) {
+	if e.Action == "" {
+		e.Action = action
+	}
 }
 
 // SetKey sets the value for the custom key

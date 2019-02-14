@@ -17,3 +17,17 @@ func TestEventTime(t *testing.T) {
 	}
 
 }
+
+func TestAction(t *testing.T) {
+
+	Init("test-req-id", "TestAction()")
+	entry := LogEntry{
+		Message: "Test",
+	}
+
+	Error(&entry)
+	if entry.Action != ActionOpen {
+		t.Errorf("Action wrong. got=%s expected=%s", entry.Action, ActionOpen)
+	}
+
+}

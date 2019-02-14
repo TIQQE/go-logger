@@ -10,5 +10,6 @@ type ILogEntry interface {
 	SetEventTime(time.Time)
 	SetSourceName(string)
 	SetErrorCode(string)
+	SetAction(AlertAction)
 	GetMessage() string
 }
