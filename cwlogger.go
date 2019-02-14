@@ -77,5 +77,6 @@ func Error(msg ILogEntry) {
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
 	msg.SetErrorCode(msg.GetMessage())
+	msg.SetAction(ActionOpen)
 	fmt.Println(msg.Stringify())
 }
