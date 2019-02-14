@@ -4,30 +4,41 @@ A small library intended to be used for logging to Cloud Watch Logs.
 
 By default it logs as JSON. 
 
-The only required property in the struct is Message, it will later be used to set titles of Alarms. 
+Initialise the logger with the AWS Request ID and Lambda name, you can find the Request ID in the lambda context and the Lambda name you can get from the runtime environment variable `AWS_LAMBDA_FUNCTION_NAME`.
 
-The `ILogEntry` interface can be used to extend the log message further with additional properties.
+There is no need to set a value in `EventTime` the logger will set the current time in the correct format by it self.
 
-The AWSRequestID needs to be set using the Init() function and LogLevel will be set depending on which logging function is used.
+For INFO messages the only required field to fill in is Message, all the other required fields will be added by the logger.
+
+For ERROR messages the `ErrorCode` field should also be filled in, if it is not then it will default to the contents of the `Message` property which is not ideal.
+
+When an ERROR is logged the `Action` field is also required, however it will default to `Open` if it is not set, so you only need too set it if you intend to use any other action such as `Update` or `Close`.
 
 The default log message looks like the following.
+
 ```go
 type LogEntry struct {
+	EventTime    string                 `json:"eventTime"`
 	Message      string                 `json:"message"`
+	SourceName   string                 `json:"sourceName"`
+	ErrorCode    string                 `json:"errorCode,omitempty"`
 	ErrorMessage string                 `json:"errorMessage,omitempty"`
 	RequestID    string                 `json:"requestId"`
 	LogLevel     string                 `json:"logLevel"`
 	Keys         map[string]interface{} `json:"keys,omitempty"`
+	Action       AlertAction            `json:"alertAction,omitempty"`
 }
 ```
 
 It will marshal into 
 ```json
 {
+    "eventTime": "2019-01-02T15:04:05.12345Z",
     "message": "A message",
+    "sourceName": "The Source",
     "errorMessage": "something",
-    "requestId": "INFO",
-    "logLevel": "asdasd-asd123-sasad-asd",
+    "requestId": "asdasd-asd123-sasad-asd",
+    "logLevel": "INFO",
     "keys": {
         "somekey": "asd",
     }
