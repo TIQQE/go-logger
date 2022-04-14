@@ -49,3 +49,6 @@ Leaving ErrorMessage empty will omit the property from the marshalled message.
 
 A map called Keys can be used to add custom fields to the log message. 
 There is a helper function to set the values in the map when needed.
+
+## DEBUG logging
+There is possible to create DEBUG level logging. DEBUG logging is only active when the log is inInitialized with InitWithDebugLevel() and the debugEnabled parameter is true. This can be used to switch the debug logging on/off, for example in test vs prod environments.
