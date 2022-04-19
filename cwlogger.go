@@ -30,27 +30,30 @@ func InitWithDebugLevel(requestID, sourceName string, debugEnabled bool) {
 
 // DebugStringf debug log helper to use sprintf formatting.
 func DebugStringf(format string, args ...interface{}) {
-	if cwLogger.debugEnabled {
-		DebugString(fmt.Sprintf(format, args...))
+	if !cwLogger.debugEnabled {
+		return
 	}
+	DebugString(fmt.Sprintf(format, args...))
 }
 
 // DebugString logs a string message with DEBUG level
 func DebugString(msg string) {
-	if cwLogger.debugEnabled {
-		Debug(&LogEntry{Message: msg})
+	if !cwLogger.debugEnabled {
+		return
 	}
+	Debug(&LogEntry{Message: msg})
 }
 
 // Debug logs a message with DEBUG level
 func Debug(msg ILogEntry) {
-	if cwLogger.debugEnabled {
-		msg.SetLogLevel("DEBUG")
-		msg.SetRequestID(cwLogger.id)
-		msg.SetEventTime(time.Now())
-		msg.SetSourceName(cwLogger.sourceName)
-		fmt.Println(msg.Stringify())
+	if !cwLogger.debugEnabled {
+		return
 	}
+	msg.SetLogLevel("DEBUG")
+	msg.SetRequestID(cwLogger.id)
+	msg.SetEventTime(time.Now())
+	msg.SetSourceName(cwLogger.sourceName)
+	fmt.Println(msg.Stringify())
 }
 
 // InfoStringf info log helper to use sprintf formatting.
