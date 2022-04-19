@@ -11,6 +11,10 @@ import (
 func TestLogging(t *testing.T) {
 	Init("test-req", "TEST")
 
+	t.Run("Debug()", testDebug)
+	t.Run("DebugString()", testDebugString)
+	t.Run("DebugStringf()", testDebugStringf)
+
 	t.Run("Info()", testInfo)
 	t.Run("InfoString()", testInfoString)
 	t.Run("InfoStringf()", testInfoStringf)
@@ -22,6 +26,75 @@ func TestLogging(t *testing.T) {
 	t.Run("Error()", testError)
 	t.Run("ErrorString()", testErrorString)
 	t.Run("ErrorStringf()", testErrorStringf)
+
+}
+
+func TestLoggingDebugInit(t *testing.T) {
+	InitWithDebugLevel("test-req", "TEST", false)
+
+	t.Run("DebugFalse - Debug", testDebug)
+	t.Run("DebugFalse - DebugString", testDebugString)
+	t.Run("DebugFalse - DebugStringf", testDebugStringf)
+
+	t.Run("DebugFalse - Info()", testInfo)
+	t.Run("DebugFalse - InfoString()", testInfoString)
+	t.Run("DebugFalse - InfoStringf()", testInfoStringf)
+
+	t.Run("DebugFalse - Warn()", testWarn)
+	t.Run("DebugFalse - WarnString()", testWarnString)
+	t.Run("DebugFalse - WarnStringf()", testWarnStringf)
+
+	t.Run("DebugFalse - Error()", testError)
+	t.Run("DebugFalse - ErrorString()", testErrorString)
+	t.Run("DebugFalse - ErrorStringf()", testErrorStringf)
+
+	InitWithDebugLevel("test-req", "TEST", true)
+
+	t.Run("DebugTrue - Debug", testDebug)
+	t.Run("DebugTrue - DebugString", testDebugString)
+	t.Run("DebugTrue - DebugStringf", testDebugStringf)
+
+	t.Run("DebugTrue - Info()", testInfo)
+	t.Run("DebugTrue - InfoString()", testInfoString)
+	t.Run("DebugTrue - InfoStringf()", testInfoStringf)
+
+	t.Run("DebugTrue - Warn()", testWarn)
+	t.Run("DebugTrue - WarnString()", testWarnString)
+	t.Run("DebugTrue - WarnStringf()", testWarnStringf)
+
+	t.Run("DebugTrue - Error()", testError)
+	t.Run("DebugTrue - ErrorString()", testErrorString)
+	t.Run("DebugTrue - ErrorStringf()", testErrorStringf)
+
+}
+
+func testDebugString(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected LogEntry
+	}{
+		{"Test", LogEntry{Message: "Test", SourceName: "TEST", RequestID: "test-req", LogLevel: "DEBUG"}},
+		{"Longer Test", LogEntry{Message: "Longer Test", SourceName: "TEST", RequestID: "test-req", LogLevel: "DEBUG"}},
+	}
+
+	for i, tc := range testCases {
+		output := captureOutput(t, func() {
+			DebugString(tc.input)
+		})
+
+		if cwLogger.debugEnabled {
+			entry := unmarshal(t, output)
+
+			if !evalEntry(t, entry, tc.expected) {
+				t.Logf("Test[%d]: %s", i, output)
+			}
+		} else {
+			if output != "" {
+				t.Logf("Test[%d]: %s", i, "Unexpected log when debug log was turned off.")
+			}
+		}
+
+	}
 }
 
 func testInfoString(t *testing.T) {
@@ -88,6 +161,36 @@ func testErrorString(t *testing.T) {
 
 		if !evalEntry(t, entry, tc.expected) {
 			t.Logf("Test[%d]: %s", i, output)
+		}
+
+	}
+}
+
+func testDebugStringf(t *testing.T) {
+	testCases := []struct {
+		input    string
+		args     []interface{}
+		expected LogEntry
+	}{
+		{"Test %d", []interface{}{1}, LogEntry{Message: "Test 1", SourceName: "TEST", RequestID: "test-req", LogLevel: "DEBUG"}},
+		{"Complex %s(%T)", []interface{}{"Test", "Test"}, LogEntry{Message: "Complex Test(string)", SourceName: "TEST", RequestID: "test-req", LogLevel: "DEBUG"}},
+	}
+
+	for i, tc := range testCases {
+		output := captureOutput(t, func() {
+			DebugStringf(tc.input, tc.args...)
+		})
+
+		if cwLogger.debugEnabled {
+			entry := unmarshal(t, output)
+
+			if !evalEntry(t, entry, tc.expected) {
+				t.Logf("Test[%d]: %s", i, output)
+			}
+		} else {
+			if output != "" {
+				t.Logf("Test[%d]: %s", i, "Unexpected log when debug log was turned off.")
+			}
 		}
 
 	}
@@ -160,6 +263,53 @@ func testErrorStringf(t *testing.T) {
 
 		if !evalEntry(t, entry, tc.expected) {
 			t.Logf("Test[%d]: %s", i, output)
+		}
+
+	}
+}
+
+func testDebug(t *testing.T) {
+	testCases := []struct {
+		input    LogEntry
+		expected LogEntry
+	}{
+		{LogEntry{Message: "Test"}, LogEntry{Message: "Test", SourceName: "TEST", RequestID: "test-req", LogLevel: "DEBUG"}},
+		{
+			LogEntry{
+				Message: "This is a more complex test",
+				Keys: map[string]interface{}{
+					"Key1": "also",
+					"Key2": "This is a key",
+				},
+			},
+			LogEntry{
+				Message: "This is a more complex test",
+				Keys: map[string]interface{}{
+					"Key1": "also",
+					"Key2": "This is a key",
+				},
+				SourceName: "TEST",
+				RequestID:  "test-req",
+				LogLevel:   "DEBUG",
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		output := captureOutput(t, func() {
+			Debug(&tc.input)
+		})
+
+		if cwLogger.debugEnabled {
+			entry := unmarshal(t, output)
+
+			if !evalEntry(t, entry, tc.expected) {
+				t.Logf("Test[%d]: %s", i, output)
+			}
+		} else {
+			if output != "" {
+				t.Logf("Test[%d]: %s", i, "Unexpected log when debug log was turned off.")
+			}
 		}
 
 	}
