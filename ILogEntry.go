@@ -11,5 +11,6 @@ type ILogEntry interface {
 	SetSourceName(string)
 	SetErrorCode(string)
 	SetAction(AlertAction)
+	SetPriority(Priority)
 	GetMessage() string
 }

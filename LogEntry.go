@@ -15,6 +15,19 @@ const (
 	ActionClose  AlertAction = "Close"
 )
 
+// Priority level
+type Priority uint
+
+// Priority constants for Jira/autoops
+const (
+	_ Priority = iota
+	PriorityHighest
+	PriorityHigh
+	PriorityMedium
+	PriorityLow
+	PriorityLowest
+)
+
 // LogEntry default log entry
 type LogEntry struct {
 	EventTime    string                 `json:"eventTime"`
@@ -26,6 +39,7 @@ type LogEntry struct {
 	LogLevel     string                 `json:"logLevel"`
 	Keys         map[string]interface{} `json:"keys,omitempty"`
 	Action       AlertAction            `json:"alertAction,omitempty"`
+	Priority     Priority               `json:"priority,omitempty"`
 }
 
 // Stringify marshal json to string
@@ -77,4 +91,8 @@ func (e *LogEntry) SetKey(key string, value interface{}) {
 		e.Keys = make(map[string]interface{})
 	}
 	e.Keys[key] = value
+}
+
+func (e *LogEntry) SetPriority(prio Priority) {
+	e.Priority = prio
 }

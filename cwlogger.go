@@ -113,5 +113,6 @@ func Error(msg ILogEntry) {
 	msg.SetSourceName(cwLogger.sourceName)
 	msg.SetErrorCode(msg.GetMessage())
 	msg.SetAction(ActionOpen)
+	msg.SetPriority(PriorityMedium)
 	fmt.Println(msg.Stringify())
 }

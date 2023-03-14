@@ -31,3 +31,17 @@ func TestAction(t *testing.T) {
 	}
 
 }
+
+func TestPriority(t *testing.T) {
+
+	Init("test-req-id", "TestPriority()")
+	entry := LogEntry{
+		Message: "Test",
+	}
+
+	Error(&entry)
+	if entry.Priority != PriorityMedium {
+		t.Errorf("Priority wrong. got=%d expected=%d", entry.Priority, PriorityMedium)
+	}
+
+}
