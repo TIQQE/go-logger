@@ -44,6 +44,10 @@ func InitWithDebugLevel(requestID, sourceName string, debugEnabled bool) {
 
 // WithKeysValue adds the value to the session map that will be merged into all log entries.
 func WithKeysValue(key string, value interface{}) {
+	if cwLogger.sessionValues == nil {
+		return
+	}
+
 	cwLogger.sessionValues[key] = value
 }
 
