@@ -27,6 +27,16 @@ func TestLogging(t *testing.T) {
 	t.Run("ErrorString()", testErrorString)
 	t.Run("ErrorStringf()", testErrorStringf)
 
+	WithKeysValue("testKey", "some value")
+	t.Run("Info() with merge values", testInfoWithMergedValues)
+	t.Run("Warn() with merge values", testWarnWithMergedValues)
+	t.Run("Error() with merge values", testErrorWithMergedValues)
+
+	Init("test-req", "TEST")
+	t.Run("Debug() after reset", testDebug)
+	t.Run("Info() after reset", testInfo)
+	t.Run("Warn() after reset", testWarn)
+	t.Run("Error() after reset", testError)
 }
 
 func TestLoggingDebugInit(t *testing.T) {
@@ -315,6 +325,195 @@ func testDebug(t *testing.T) {
 	}
 }
 
+func testInfoWithMergedValues(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    LogEntry
+		expected LogEntry
+	}{
+		{
+			name: "no values in entry",
+			input: LogEntry{
+				Message: "some data",
+			},
+			expected: LogEntry{
+				Message:    "some data",
+				SourceName: "TEST",
+				RequestID:  "test-req",
+				LogLevel:   "INFO",
+				Keys: map[string]interface{}{
+					"testKey": "some value",
+				},
+			},
+		},
+		{
+			name: "values in entry",
+			input: LogEntry{
+				Message: "some data",
+				Keys: map[string]interface{}{
+					"otherValue": 11,
+				},
+			},
+			expected: LogEntry{
+				Message:    "some data",
+				SourceName: "TEST",
+				RequestID:  "test-req",
+				LogLevel:   "INFO",
+				Keys: map[string]interface{}{
+					"testKey": "some value",
+					// the back and forth in JSON marshalling using undefined types result in it being treated as
+					// a float64 value.
+					"otherValue": float64(11),
+				},
+			},
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output := captureOutput(t, func() {
+				Info(&tt.input)
+			})
+
+			entry := unmarshal(t, output)
+
+			if !evalEntry(t, entry, tt.expected) {
+				t.Logf("Test[%d]: %s", i, output)
+			}
+		})
+	}
+}
+
+func testWarnWithMergedValues(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    LogEntry
+		expected LogEntry
+	}{
+		{
+			name: "no values in entry",
+			input: LogEntry{
+				Message: "some data",
+			},
+			expected: LogEntry{
+				Message:    "some data",
+				ErrorCode:  "some data",
+				SourceName: "TEST",
+				RequestID:  "test-req",
+				LogLevel:   "WARNING",
+				Keys: map[string]interface{}{
+					"testKey": "some value",
+				},
+			},
+		},
+		{
+			name: "values in entry",
+			input: LogEntry{
+				Message: "some data",
+				Keys: map[string]interface{}{
+					"otherValue": 11,
+				},
+			},
+			expected: LogEntry{
+				Message:    "some data",
+				SourceName: "TEST",
+				RequestID:  "test-req",
+				LogLevel:   "WARNING",
+				ErrorCode:  "some data",
+				Keys: map[string]interface{}{
+					"testKey": "some value",
+					// the back and forth in JSON marshalling using undefined types result in it being treated as
+					// a float64 value.
+					"otherValue": float64(11),
+				},
+			},
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output := captureOutput(t, func() {
+				Warn(&tt.input)
+			})
+
+			entry := unmarshal(t, output)
+
+			if !evalEntry(t, entry, tt.expected) {
+				t.Logf("Test[%d]: %s", i, output)
+			}
+		})
+	}
+}
+
+func testErrorWithMergedValues(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    LogEntry
+		expected LogEntry
+	}{
+		{
+			name: "no values in entry",
+			input: LogEntry{
+				Message:      "some data",
+				ErrorMessage: "Test error",
+				ErrorCode:    "Code",
+			},
+			expected: LogEntry{
+				Message:      "some data",
+				ErrorMessage: "Test error",
+				ErrorCode:    "Code",
+				SourceName:   "TEST",
+				RequestID:    "test-req",
+				LogLevel:     "ERROR",
+				Action:       ActionOpen,
+				Keys: map[string]interface{}{
+					"testKey": "some value",
+				},
+			},
+		},
+		{
+			name: "values in entry",
+			input: LogEntry{
+				Message:      "some data",
+				ErrorMessage: "Test error",
+				ErrorCode:    "Code",
+				Keys: map[string]interface{}{
+					"otherValue": 11,
+				},
+			},
+			expected: LogEntry{
+				Message:      "some data",
+				SourceName:   "TEST",
+				RequestID:    "test-req",
+				LogLevel:     "ERROR",
+				ErrorMessage: "Test error",
+				ErrorCode:    "Code",
+				Action:       ActionOpen,
+				Keys: map[string]interface{}{
+					"testKey": "some value",
+					// the back and forth in JSON marshalling using undefined types result in it being treated as
+					// a float64 value.
+					"otherValue": float64(11),
+				},
+			},
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output := captureOutput(t, func() {
+				Error(&tt.input)
+			})
+
+			entry := unmarshal(t, output)
+
+			if !evalEntry(t, entry, tt.expected) {
+				t.Logf("Test[%d]: %s", i, output)
+			}
+		})
+	}
+}
+
 func testInfo(t *testing.T) {
 	testCases := []struct {
 		input    LogEntry
@@ -444,6 +643,8 @@ func testError(t *testing.T) {
 }
 
 func evalEntry(t *testing.T, entry, expected LogEntry) bool {
+	t.Helper()
+
 	if entry.Message != expected.Message {
 		t.Errorf("Message is wrong. got=%s want=%s", entry.Message, expected.Message)
 		return false

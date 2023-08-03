@@ -13,3 +13,7 @@ type ILogEntry interface {
 	SetAction(AlertAction)
 	GetMessage() string
 }
+
+type KeyValueHolder interface {
+	SetKey(key string, value interface{})
+}

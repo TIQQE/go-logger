@@ -10,9 +10,22 @@ type logger struct {
 	sourceName   string
 	sourceID     string
 	debugEnabled bool
+
+	sessionValues map[string]interface{}
 }
 
 var cwLogger logger
+
+func (l logger) mergeSessionValues(entry interface{}) {
+	e, ok := entry.(KeyValueHolder)
+	if !ok {
+		return
+	}
+
+	for k, v := range l.sessionValues {
+		e.SetKey(k, v)
+	}
+}
 
 // Init initializes the logger with the request id and prefix. Using this initialization method will disable debug logging.
 func Init(requestID, sourceName string) {
@@ -22,10 +35,16 @@ func Init(requestID, sourceName string) {
 // InitWithDebugLevel initializes the logger with the request id and prefix. The parameter debugEnabled specifies if logging of log level Debug will be enabled or not.
 func InitWithDebugLevel(requestID, sourceName string, debugEnabled bool) {
 	cwLogger = logger{
-		id:           requestID,
-		sourceName:   sourceName,
-		debugEnabled: debugEnabled,
+		id:            requestID,
+		sourceName:    sourceName,
+		debugEnabled:  debugEnabled,
+		sessionValues: map[string]interface{}{},
 	}
+}
+
+// WithKeysValue adds the value to the session map that will be merged into all log entries.
+func WithKeysValue(key string, value interface{}) {
+	cwLogger.sessionValues[key] = value
 }
 
 // DebugStringf debug log helper to use sprintf formatting.
@@ -53,6 +72,7 @@ func Debug(msg ILogEntry) {
 	msg.SetRequestID(cwLogger.id)
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
+	cwLogger.mergeSessionValues(msg)
 	fmt.Println(msg.Stringify())
 }
 
@@ -72,6 +92,7 @@ func Info(msg ILogEntry) {
 	msg.SetRequestID(cwLogger.id)
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
+	cwLogger.mergeSessionValues(msg)
 	fmt.Println(msg.Stringify())
 }
 
@@ -92,6 +113,7 @@ func Warn(msg ILogEntry) {
 	msg.SetEventTime(time.Now())
 	msg.SetSourceName(cwLogger.sourceName)
 	msg.SetErrorCode(msg.GetMessage())
+	cwLogger.mergeSessionValues(msg)
 	fmt.Println(msg.Stringify())
 }
 
@@ -113,5 +135,6 @@ func Error(msg ILogEntry) {
 	msg.SetSourceName(cwLogger.sourceName)
 	msg.SetErrorCode(msg.GetMessage())
 	msg.SetAction(ActionOpen)
+	cwLogger.mergeSessionValues(msg)
 	fmt.Println(msg.Stringify())
 }
