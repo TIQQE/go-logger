@@ -40,7 +40,7 @@ It will marshal into
     "requestId": "asdasd-asd123-sasad-asd",
     "logLevel": "INFO",
     "keys": {
-        "somekey": "asd",
+        "somekey": "asd"
     }
 }
 ```
@@ -52,3 +52,33 @@ There is a helper function to set the values in the map when needed.
 
 ## DEBUG logging
 There is possible to create DEBUG level logging. DEBUG logging is only active when the log is inInitialized with InitWithDebugLevel() and the debugEnabled parameter is true. This can be used to switch the debug logging on/off, for example in test vs prod environments.
+
+## Logging Session Values
+Sometimes you may want to log the same value in Keys pretty much all the time. 
+For instance when working with an order you might want to log the order number as soon as you know what it is.
+
+The `WithKeysValue` function exists to assist with this. 
+Call it once with the value you want to add, and it will be added to all log statements thereafter.
+
+Note that it will overwrite anything that has the same key.
+
+```go
+func doStuff() {
+	logger.WithKeysValue("myKey", "important")
+	
+	logger.InfoString("my message")
+}
+```
+The output of the InfoString would look something like
+```json
+{
+    "eventTime": "2019-01-02T15:04:05.12345Z",
+    "message": "my message",
+    "sourceName": "The Source",
+    "requestId": "asdasd-asd123-sasad-asd",
+    "logLevel": "INFO",
+    "keys": {
+        "myKey": "important"
+    }
+}
+```
