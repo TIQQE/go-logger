@@ -51,6 +51,23 @@ func WithKeysValue(key string, value interface{}) {
 	cwLogger.sessionValues[key] = value
 }
 
+// ClearKeys overwrites the session values with a new empty map
+func ClearKeys() {
+	if cwLogger.sessionValues == nil {
+		return
+	}
+
+	cwLogger.sessionValues = make(map[string]interface{})
+}
+
+func DeleteKey(key string) {
+	if cwLogger.sessionValues == nil || len(key) == 0 {
+		return
+	}
+
+	delete(cwLogger.sessionValues, key)
+}
+
 // DebugStringf debug log helper to use sprintf formatting.
 func DebugStringf(format string, args ...interface{}) {
 	if !cwLogger.debugEnabled {

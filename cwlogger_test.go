@@ -34,6 +34,16 @@ func TestLogging(t *testing.T) {
 	t.Run("Warn() with merge values", testWarnWithMergedValues)
 	t.Run("Error() with merge values", testErrorWithMergedValues)
 
+	ClearKeys()
+	t.Run("Info() - after clear", testInfo)
+	t.Run("InfoString() - after clear", testInfoString)
+	t.Run("InfoStringf() - acter clear", testInfoStringf)
+
+	WithKeysValue("testKey", "some value")
+	t.Run("Info() value added again", testInfoWithMergedValues)
+	DeleteKey("testKey")
+	t.Run("Info() - after delete", testInfo)
+
 	Init("test-req", "TEST")
 	t.Run("Debug() after reset", testDebug)
 	t.Run("Info() after reset", testInfo)
@@ -77,7 +87,6 @@ func TestLoggingDebugInit(t *testing.T) {
 	t.Run("DebugTrue - Error()", testError)
 	t.Run("DebugTrue - ErrorString()", testErrorString)
 	t.Run("DebugTrue - ErrorStringf()", testErrorStringf)
-
 }
 
 func testDebugString(t *testing.T) {
@@ -783,7 +792,6 @@ func unmarshal(t *testing.T, str string) (entry LogEntry) {
 }
 
 func captureOutput(t *testing.T, f func()) string {
-
 	r, w, err := os.Pipe()
 	if err != nil {
 		t.Fatalf("failed to create pipe for stdoutput: %v", err)
